@@ -76,7 +76,7 @@ h1{
 
 .stats{
     display:grid;
-    grid-template-columns:1fr;
+    grid-template-columns:1fr 1fr;
     gap:12px;
     margin-top:20px;
 }
@@ -102,6 +102,12 @@ h1{
     color:#bbb;
     margin-top:25px;
     line-height:1.6;
+}
+
+.status{
+    font-size:12px;
+    color:#aaa;
+    margin-top:10px;
 }
 </style>
 </head>
@@ -167,28 +173,53 @@ onclick="sharePage()">
 </button>
 
 
-<!-- PAGE VIEWS -->
+<!-- STATS -->
 
 <div class="stats">
 
-<div class="stat">
+    <div class="stat">
+
+        <div
+        class="number"
+        id="views">
+
+        0
+
+        </div>
+
+        <div class="label">
+
+        Page Views
+
+        </div>
+
+    </div>
+
+
+    <div class="stat">
+
+        <div
+        class="number"
+        id="shares">
+
+        0
+
+        </div>
+
+        <div class="label">
+
+        Shares
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <div
-class="number"
-id="views">
-
-0
-
-</div>
-
-<div class="label">
-
-Page Views
-
-</div>
-
-</div>
-
+class="status"
+id="status">
 </div>
 
 
@@ -198,7 +229,7 @@ Page Views
 
 <br><br>
 
-Page Views Supabase database மூலம் கணக்கிடப்படுகிறது.
+Page Views & Shares Supabase database மூலம் கணக்கிடப்படுகிறது.
 
 </div>
 
@@ -229,7 +260,8 @@ async function supabaseRequest(
     options = {}
 ){
 
-    const response = await fetch(
+    const response =
+    await fetch(
         SUPABASE_URL +
         "/rest/v1/" +
         table,
@@ -237,10 +269,12 @@ async function supabaseRequest(
             ...options,
 
             headers:{
-                "apikey":SUPABASE_KEY,
+                "apikey":
+                SUPABASE_KEY,
 
                 "Authorization":
-                "Bearer " + SUPABASE_KEY,
+                "Bearer " +
+                SUPABASE_KEY,
 
                 "Content-Type":
                 "application/json",
@@ -265,6 +299,7 @@ async function addPageView(){
 
     try{
 
+        const response =
         await supabaseRequest(
             "Visitors",
             {
@@ -274,7 +309,16 @@ async function addPageView(){
             }
         );
 
-        getPageViews();
+
+        if(!response.ok){
+
+            console.log(
+                "Visitor insert failed:",
+                response.status,
+                await response.text()
+            );
+
+        }
 
     }catch(error){
 
@@ -284,6 +328,8 @@ async function addPageView(){
         );
 
     }
+
+    getPageViews();
 
 }
 
@@ -327,6 +373,19 @@ async function getPageViews(){
         );
 
 
+        if(!response.ok){
+
+            console.log(
+                "View count failed:",
+                response.status,
+                await response.text()
+            );
+
+            return;
+
+        }
+
+
         const contentRange =
         response.headers.get(
             "content-range"
@@ -339,10 +398,11 @@ async function getPageViews(){
             contentRange
             .split("/")[1];
 
+
             document.getElementById(
                 "views"
             ).innerText =
-            total;
+            total || "0";
 
         }
 
@@ -350,6 +410,136 @@ async function getPageViews(){
 
         console.log(
             "View count error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================
+   ADD SHARE
+========================= */
+
+async function recordShare(){
+
+    try{
+
+        const response =
+        await supabaseRequest(
+            "Share",
+            {
+                method:"POST",
+
+                body:JSON.stringify({})
+            }
+        );
+
+
+        if(!response.ok){
+
+            console.log(
+                "Share insert failed:",
+                response.status,
+                await response.text()
+            );
+
+            return;
+
+        }
+
+
+        getShareCount();
+
+    }catch(error){
+
+        console.log(
+            "Share error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================
+   GET SHARE COUNT
+========================= */
+
+async function getShareCount(){
+
+    try{
+
+        const response =
+        await fetch(
+
+            SUPABASE_URL +
+            "/rest/v1/Share?select=id",
+
+            {
+                method:"GET",
+
+                headers:{
+
+                    "apikey":
+                    SUPABASE_KEY,
+
+                    "Authorization":
+                    "Bearer " +
+                    SUPABASE_KEY,
+
+                    "Prefer":
+                    "count=exact",
+
+                    "Range":
+                    "0-0"
+
+                }
+
+            }
+
+        );
+
+
+        if(!response.ok){
+
+            console.log(
+                "Share count failed:",
+                response.status,
+                await response.text()
+            );
+
+            return;
+
+        }
+
+
+        const contentRange =
+        response.headers.get(
+            "content-range"
+        );
+
+
+        if(contentRange){
+
+            const total =
+            contentRange
+            .split("/")[1];
+
+
+            document.getElementById(
+                "shares"
+            ).innerText =
+            total || "0";
+
+        }
+
+    }catch(error){
+
+        console.log(
+            "Share count error:",
             error
         );
 
@@ -413,9 +603,11 @@ async function copyReferral(){
         await navigator.clipboard
         .writeText(link);
 
+
         alert(
             "Referral link copied! 🔗"
         );
+
 
     }catch(error){
 
@@ -439,6 +631,10 @@ async function sharePage(){
     getReferralLink();
 
 
+    /* =====================
+       NATIVE SHARE
+    ===================== */
+
     if(navigator.share){
 
         try{
@@ -456,6 +652,13 @@ async function sharePage(){
 
             });
 
+
+            /* Record only after
+               successful share */
+
+            await recordShare();
+
+
         }catch(error){
 
             console.log(
@@ -465,25 +668,35 @@ async function sharePage(){
 
         }
 
-    }else{
+        return;
 
-        try{
+    }
 
-            await navigator.clipboard
-            .writeText(link);
 
-            alert(
-                "Link copied! 📋"
-            );
+    /* =====================
+       FALLBACK
+    ===================== */
 
-        }catch(error){
+    try{
 
-            prompt(
-                "இந்த link-ஐ Share செய்யுங்கள்:",
-                link
-            );
+        await navigator.clipboard
+        .writeText(link);
 
-        }
+
+        alert(
+            "Link copied! 📋"
+        );
+
+
+        await recordShare();
+
+
+    }catch(error){
+
+        prompt(
+            "இந்த link-ஐ Share செய்யுங்கள்:",
+            link
+        );
 
     }
 
@@ -491,10 +704,15 @@ async function sharePage(){
 
 
 /* =========================
-   START
+   INITIAL LOAD
 ========================= */
 
+getPageViews();
+
+getShareCount();
+
 addPageView();
+
 
 </script>
 
