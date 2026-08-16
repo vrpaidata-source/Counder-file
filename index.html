@@ -43,7 +43,8 @@ h1{
 }
 
 .follow,
-.copy{
+.copy,
+.share{
     width:100%;
     display:block;
     border:0;
@@ -67,6 +68,10 @@ h1{
 
 .copy{
     background:#7c3aed;
+}
+
+.share{
+    background:#059669;
 }
 
 .stats{
@@ -113,6 +118,7 @@ h1{
 Tamil Comedy • AI Animation • Fun Videos
 </p>
 
+
 <!-- INSTAGRAM -->
 
 <a
@@ -146,6 +152,17 @@ class="copy"
 onclick="copyReferral()">
 
 🔗 Referral Link Copy
+
+</button>
+
+
+<!-- SHARE -->
+
+<button
+class="share"
+onclick="sharePage()">
+
+📤 இந்த Page-ஐ Share செய்யுங்கள்
 
 </button>
 
@@ -406,6 +423,67 @@ async function copyReferral(){
             "இந்த link-ஐ Copy செய்யுங்கள்:",
             link
         );
+
+    }
+
+}
+
+
+/* =========================
+   SHARE PAGE
+========================= */
+
+async function sharePage(){
+
+    const link =
+    getReferralLink();
+
+
+    if(navigator.share){
+
+        try{
+
+            await navigator.share({
+
+                title:
+                "😂 VR Paidata",
+
+                text:
+                "😂 VR Paidata - Tamil Comedy • AI Animation • Fun Videos",
+
+                url:
+                link
+
+            });
+
+        }catch(error){
+
+            console.log(
+                "Share cancelled:",
+                error
+            );
+
+        }
+
+    }else{
+
+        try{
+
+            await navigator.clipboard
+            .writeText(link);
+
+            alert(
+                "Link copied! 📋"
+            );
+
+        }catch(error){
+
+            prompt(
+                "இந்த link-ஐ Share செய்யுங்கள்:",
+                link
+            );
+
+        }
 
     }
 
