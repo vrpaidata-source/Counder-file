@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>VR PAIData </title>
+<title>VR Paidata | Tamil Comedy</title>
 
 <style>
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
     margin:0;
@@ -25,25 +22,21 @@ body{
 }
 
 .card{
-    background:rgba(255,255,255,0.10);
+    background:rgba(255,255,255,.10);
     border-radius:25px;
     padding:25px;
     text-align:center;
     box-shadow:0 10px 40px rgba(0,0,0,.3);
 }
 
-h1{
-    font-size:32px;
-    margin-bottom:5px;
-}
+h1{font-size:32px;margin-bottom:5px}
 
 .subtitle{
     color:#ddd;
     margin-bottom:25px;
 }
 
-button,
-.follow{
+button,.follow{
     width:100%;
     display:block;
     border:0;
@@ -57,21 +50,10 @@ button,
     cursor:pointer;
 }
 
-.instagram{
-    background:#e1306c;
-}
-
-.facebook{
-    background:#1877f2;
-}
-
-.share{
-    background:#16a34a;
-}
-
-.copy{
-    background:#7c3aed;
-}
+.instagram{background:#e1306c}
+.facebook{background:#1877f2}
+.share{background:#16a34a}
+.copy{background:#7c3aed}
 
 .stats{
     display:grid;
@@ -108,38 +90,31 @@ button,
 <body>
 
 <div class="container">
-
 <div class="card">
 
-<h1>VR Paidata</h1>
+<h1>😂 VR Paidata</h1>
 
 <p class="subtitle">
-நண்பர்களே சேர் பண்ணுங்க • கமெண்ட் • லைக்👍
+Tamil Comedy • AI Animation • Fun Videos
 </p>
 
-<a
-class="follow instagram"
+<a class="follow instagram"
 href="https://www.instagram.com/vrpaidata/"
 target="_blank">
 📸 Instagram-ல் Follow செய்யுங்கள்
 </a>
 
-<a
-class="follow facebook"
+<a class="follow facebook"
 href="https://www.facebook.com/share/19PZBhTyHL/"
 target="_blank">
 👍 Facebook-ல் Follow செய்யுங்கள்
 </a>
 
-<button
-class="share"
-onclick="sharePage()">
+<button class="share" onclick="sharePage()">
 📤 நண்பர்களுடன் Share செய்யுங்கள்
 </button>
 
-<button
-class="copy"
-onclick="copyReferral()">
+<button class="copy" onclick="copyReferral()">
 🔗 Referral Link Copy
 </button>
 
@@ -158,24 +133,17 @@ onclick="copyReferral()">
 </div>
 
 <div class="footer">
-
- உங்கள் நண்பர்களுக்கும் இந்த page-ஐ share செய்யுங்கள்!
-
+😂 உங்கள் நண்பர்களுக்கும் இந்த page-ஐ share செய்யுங்கள்!
 <br><br>
-
 Page Views Supabase database மூலம் கணக்கிடப்படுகிறது.
-
 </div>
 
 </div>
-
 </div>
 
 <script>
 
-/* ================================
-   SUPABASE SETTINGS
-================================ */
+/* SUPABASE */
 
 const SUPABASE_URL =
 "https://saesruoufprdchtnbedk.supabase.co";
@@ -184,73 +152,65 @@ const SUPABASE_KEY =
 "sb_publishable_YdTvNMS3TgS5Pe9yyQS7pg_UlsTsqf9";
 
 
-/* ================================
-   RECORD PAGE VIEW
-================================ */
+/* PAGE VIEW */
 
 async function recordPageView(){
 
 try{
 
-await fetch(
+const response = await fetch(
 SUPABASE_URL + "/rest/v1/visits",
 {
 method:"POST",
-
 headers:{
 "apikey":SUPABASE_KEY,
 "Authorization":"Bearer " + SUPABASE_KEY,
 "Content-Type":"application/json",
 "Prefer":"return=minimal"
 },
-
 body:JSON.stringify({})
 }
 );
 
+if(response.ok){
 loadViewCount();
+}else{
+console.log("View insert failed:",response.status);
+}
 
 }catch(error){
-
 console.log("View tracking error:",error);
-
 }
 
 }
 
 
-/* ================================
-   GET TOTAL PAGE VIEWS
-================================ */
+/* GET TOTAL VIEWS */
 
 async function loadViewCount(){
 
 try{
 
-const response =
-await fetch(
-SUPABASE_URL +
-"/rest/v1/visits?select=id",
+const response = await fetch(
+SUPABASE_URL + "/rest/v1/visits?select=id",
 {
 method:"GET",
-
 headers:{
 "apikey":SUPABASE_KEY,
 "Authorization":"Bearer " + SUPABASE_KEY,
 "Prefer":"count=exact",
 "Range":"0-0"
 }
-
 }
 );
 
-const contentRange =
+const range =
 response.headers.get("content-range");
 
-if(contentRange){
+if(range){
 
 const total =
-contentRange.split("/")[1];
+range.split("/")[1];
 
 document.getElementById("views").innerText =
 total || "0";
@@ -258,31 +218,22 @@ total || "0";
 }
 
 }catch(error){
-
 console.log("Count error:",error);
-
 }
 
 }
 
 
-/* ================================
-   SHARE COUNT
-   (LOCAL FOR NOW)
-================================ */
+/* SHARE COUNT */
 
 let shares =
-Number(
-localStorage.getItem("vr_shares") || 0
-);
+Number(localStorage.getItem("vr_shares") || 0);
 
 document.getElementById("shares").innerText =
 shares;
 
 
-/* ================================
-   REFERRAL LINK
-================================ */
+/* REFERRAL LINK */
 
 function getReferralLink(){
 
@@ -298,36 +249,27 @@ Math.random()
 .substring(2,8)
 .toUpperCase();
 
-localStorage.setItem(
-"vr_ref_id",
-id
-);
+localStorage.setItem("vr_ref_id",id);
 
 }
 
 return location.origin +
 location.pathname +
-"?ref=" +
-id;
+"?ref=" + id;
 
 }
 
 
-/* ================================
-   SHARE
-================================ */
+/* SHARE */
 
 async function sharePage(){
 
-let link =
+const link =
 getReferralLink();
 
 shares++;
 
-localStorage.setItem(
-"vr_shares",
-shares
-);
+localStorage.setItem("vr_shares",shares);
 
 document.getElementById("shares").innerText =
 shares;
@@ -337,19 +279,12 @@ if(navigator.share){
 try{
 
 await navigator.share({
-
 title:"VR Paidata",
-
-text:
-"VR PAIData உடன் இனைந்து இருங்கள்,
-
+text:"😂 இந்த Tamil Comedy page-ஐ பாருங்க!",
 url:link
-
 });
 
-}catch(error){
-
-}
+}catch(error){}
 
 }else{
 
@@ -357,9 +292,7 @@ try{
 
 await navigator.clipboard.writeText(link);
 
-alert(
-"Referral link copied! நண்பர்களுக்கு அனுப்புங்கள் 😂"
-);
+alert("Referral link copied! நண்பர்களுக்கு அனுப்புங்கள் 😂");
 
 }catch(error){
 
@@ -372,22 +305,18 @@ alert(link);
 }
 
 
-/* ================================
-   COPY REFERRAL
-================================ */
+/* COPY */
 
 async function copyReferral(){
 
-let link =
+const link =
 getReferralLink();
 
 try{
 
 await navigator.clipboard.writeText(link);
 
-alert(
-"Referral link copied! 🔗"
-);
+alert("Referral link copied! 🔗");
 
 }catch(error){
 
@@ -398,9 +327,7 @@ alert(link);
 }
 
 
-/* ================================
-   START TRACKING
-================================ */
+/* START */
 
 recordPageView();
 
