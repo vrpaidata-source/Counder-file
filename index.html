@@ -1,1 +1,340 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>VR Paidata | Tamil Comedy</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:linear-gradient(135deg,#111827,#4c1d95);
+    color:white;
+}
+
+.container{
+    max-width:600px;
+    margin:auto;
+    padding:25px 15px;
+}
+
+.card{
+    background:rgba(255,255,255,0.10);
+    border-radius:25px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 10px 40px rgba(0,0,0,.3);
+}
+
+h1{
+    font-size:32px;
+    margin-bottom:5px;
+}
+
+.subtitle{
+    color:#ddd;
+    margin-bottom:25px;
+}
+
+button,
+.follow{
+    width:100%;
+    display:block;
+    border:0;
+    padding:16px;
+    margin:12px 0;
+    border-radius:15px;
+    font-size:17px;
+    font-weight:bold;
+    color:white;
+    text-decoration:none;
+    cursor:pointer;
+}
+
+.instagram{
+    background:#e1306c;
+}
+
+.facebook{
+    background:#1877f2;
+}
+
+.share{
+    background:#16a34a;
+}
+
+.copy{
+    background:#7c3aed;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:20px;
+}
+
+.stat{
+    background:rgba(0,0,0,.25);
+    padding:18px;
+    border-radius:15px;
+}
+
+.number{
+    font-size:28px;
+    font-weight:bold;
+}
+
+.label{
+    font-size:12px;
+    color:#ccc;
+}
+
+.footer{
+    font-size:12px;
+    color:#bbb;
+    margin-top:25px;
+    line-height:1.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<h1>😂 VR Paidata</h1>
+
+<p class="subtitle">
+Tamil Comedy • AI Animation • Fun Videos
+</p>
+
+<!-- INSTAGRAM -->
+
+<a
+class="follow instagram"
+href="https://www.instagram.com/vrpaidata/"
+target="_blank">
+📸 Instagram-ல் Follow செய்யுங்கள்
+</a>
+
+
+<!-- FACEBOOK -->
+
+<a
+class="follow facebook"
+href="https://www.facebook.com/share/19PZBhTyHL/"
+target="_blank">
+👍 Facebook-ல் Follow செய்யுங்கள்
+</a>
+
+
+<!-- SHARE -->
+
+<button
+class="share"
+onclick="sharePage()">
+
+📤 நண்பர்களுடன் Share செய்யுங்கள்
+
+</button>
+
+
+<!-- COPY REFERRAL -->
+
+<button
+class="copy"
+onclick="copyReferral()">
+
+🔗 Referral Link Copy
+
+</button>
+
+
+<!-- STATS -->
+
+<div class="stats">
+
+<div class="stat">
+
+<div
+class="number"
+id="views">
+0
+</div>
+
+<div class="label">
+Page Views
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div
+class="number"
+id="shares">
+0
+</div>
+
+<div class="label">
+Share Clicks
+</div>
+
+</div>
+
+</div>
+
+
+<div class="footer">
+
+😂 உங்கள் நண்பர்களுக்கும் இந்த page-ஐ share செய்யுங்கள்!
+
+<br><br>
+
+Referral tracking-ன் real total count பெற
+backend/database தேவைப்படும்.
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* PAGE VIEW */
+
+let views =
+Number(localStorage.getItem("vr_views") || 0);
+
+views++;
+
+localStorage.setItem(
+"vr_views",
+views
+);
+
+document.getElementById("views")
+.innerText = views;
+
+
+/* SHARE COUNT */
+
+let shares =
+Number(localStorage.getItem("vr_shares") || 0);
+
+document.getElementById("shares")
+.innerText = shares;
+
+
+/* REFERRAL ID */
+
+function getReferralLink(){
+
+let id =
+localStorage.getItem("vr_ref_id");
+
+if(!id){
+
+id =
+"VR" +
+Math.random()
+.toString(36)
+.substring(2,8)
+.toUpperCase();
+
+localStorage.setItem(
+"vr_ref_id",
+id
+);
+
+}
+
+return location.origin +
+location.pathname +
+"?ref=" +
+id;
+
+}
+
+
+/* SHARE */
+
+async function sharePage(){
+
+let link =
+getReferralLink();
+
+shares++;
+
+localStorage.setItem(
+"vr_shares",
+shares
+);
+
+document.getElementById("shares")
+.innerText = shares;
+
+
+if(navigator.share){
+
+try{
+
+await navigator.share({
+
+title:"VR Paidata",
+
+text:
+"😂 இந்த Tamil Comedy page-ஐ பாருங்க!",
+
+url:link
+
+});
+
+}catch(error){
+
+}
+
+}else{
+
+await navigator.clipboard.writeText(link);
+
+alert(
+"Referral link copied! நண்பர்களுக்கு அனுப்புங்கள் 😂"
+);
+
+}
+
+}
+
+
+/* COPY LINK */
+
+async function copyReferral(){
+
+let link =
+getReferralLink();
+
+await navigator.clipboard.writeText(link);
+
+alert(
+"Referral link copied! 🔗"
+);
+
+}
+
+</script>
+
+</body>
+</html>
