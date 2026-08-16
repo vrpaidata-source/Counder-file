@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>VR Paidata | Tamil Comedy</title>
+<title>VR Paidata |Sponsored by VIKNESH NAGENDRAN</title>
 
 <style>
 *{
@@ -114,10 +114,8 @@ button,
 <h1>😂 VR Paidata</h1>
 
 <p class="subtitle">
-Tamil Comedy • AI Animation • Fun Videos
-</p>
-
-<!-- INSTAGRAM -->
+தங்களின் ஆதரவுகளுக்கு நன்றி நண்பர்களே
+/p>
 
 <a
 class="follow instagram"
@@ -126,9 +124,6 @@ target="_blank">
 📸 Instagram-ல் Follow செய்யுங்கள்
 </a>
 
-
-<!-- FACEBOOK -->
-
 <a
 class="follow facebook"
 href="https://www.facebook.com/share/19PZBhTyHL/"
@@ -136,64 +131,31 @@ target="_blank">
 👍 Facebook-ல் Follow செய்யுங்கள்
 </a>
 
-
-<!-- SHARE -->
-
 <button
 class="share"
 onclick="sharePage()">
-
 📤 நண்பர்களுடன் Share செய்யுங்கள்
-
 </button>
-
-
-<!-- COPY REFERRAL -->
 
 <button
 class="copy"
 onclick="copyReferral()">
-
 🔗 Referral Link Copy
-
 </button>
-
-
-<!-- STATS -->
 
 <div class="stats">
 
 <div class="stat">
-
-<div
-class="number"
-id="views">
-0
+<div class="number" id="views">0</div>
+<div class="label">Page Views</div>
 </div>
-
-<div class="label">
-Page Views
-</div>
-
-</div>
-
 
 <div class="stat">
-
-<div
-class="number"
-id="shares">
-0
-</div>
-
-<div class="label">
-Share Clicks
+<div class="number" id="shares">0</div>
+<div class="label">Share Clicks</div>
 </div>
 
 </div>
-
-</div>
-
 
 <div class="footer">
 
@@ -201,44 +163,126 @@ Share Clicks
 
 <br><br>
 
-Referral tracking-ன் real total count பெற
-backend/database தேவைப்படும்.
+VR PAIData உடன் இனைந்தே இருங்கள் .
 
 </div>
 
 </div>
 
 </div>
-
 
 <script>
 
-/* PAGE VIEW */
+/* ================================
+   SUPABASE SETTINGS
+================================ */
 
-let views =
-Number(localStorage.getItem("vr_views") || 0);
+const SUPABASE_URL =
+"https://saesruoufprdchtnbedk.supabase.co";
 
-views++;
+const SUPABASE_KEY =
+"sb_publishable_YdTvNMS3TgS5Pe9yyQS7pg_UlsTsqf9";
 
-localStorage.setItem(
-"vr_views",
-views
+
+/* ================================
+   RECORD PAGE VIEW
+================================ */
+
+async function recordPageView(){
+
+try{
+
+await fetch(
+SUPABASE_URL + "/rest/v1/visits",
+{
+method:"POST",
+
+headers:{
+"apikey":SUPABASE_KEY,
+"Authorization":"Bearer " + SUPABASE_KEY,
+"Content-Type":"application/json",
+"Prefer":"return=minimal"
+},
+
+body:JSON.stringify({})
+}
 );
 
-document.getElementById("views")
-.innerText = views;
+loadViewCount();
+
+}catch(error){
+
+console.log("View tracking error:",error);
+
+}
+
+}
 
 
-/* SHARE COUNT */
+/* ================================
+   GET TOTAL PAGE VIEWS
+================================ */
+
+async function loadViewCount(){
+
+try{
+
+const response =
+await fetch(
+SUPABASE_URL +
+"/rest/v1/visits?select=id",
+{
+method:"GET",
+
+headers:{
+"apikey":SUPABASE_KEY,
+"Authorization":"Bearer " + SUPABASE_KEY,
+"Prefer":"count=exact",
+"Range":"0-0"
+}
+
+}
+);
+
+const contentRange =
+response.headers.get("content-range");
+
+if(contentRange){
+
+const total =
+contentRange.split("/")[1];
+
+document.getElementById("views").innerText =
+total || "0";
+
+}
+
+}catch(error){
+
+console.log("Count error:",error);
+
+}
+
+}
+
+
+/* ================================
+   SHARE COUNT
+   (LOCAL FOR NOW)
+================================ */
 
 let shares =
-Number(localStorage.getItem("vr_shares") || 0);
+Number(
+localStorage.getItem("vr_shares") || 0
+);
 
-document.getElementById("shares")
-.innerText = shares;
+document.getElementById("shares").innerText =
+shares;
 
 
-/* REFERRAL ID */
+/* ================================
+   REFERRAL LINK
+================================ */
 
 function getReferralLink(){
 
@@ -269,7 +313,9 @@ id;
 }
 
 
-/* SHARE */
+/* ================================
+   SHARE
+================================ */
 
 async function sharePage(){
 
@@ -283,9 +329,8 @@ localStorage.setItem(
 shares
 );
 
-document.getElementById("shares")
-.innerText = shares;
-
+document.getElementById("shares").innerText =
+shares;
 
 if(navigator.share){
 
@@ -308,23 +353,35 @@ url:link
 
 }else{
 
+try{
+
 await navigator.clipboard.writeText(link);
 
 alert(
 "Referral link copied! நண்பர்களுக்கு அனுப்புங்கள் 😂"
 );
 
+}catch(error){
+
+alert(link);
+
+}
+
 }
 
 }
 
 
-/* COPY LINK */
+/* ================================
+   COPY REFERRAL
+================================ */
 
 async function copyReferral(){
 
 let link =
 getReferralLink();
+
+try{
 
 await navigator.clipboard.writeText(link);
 
@@ -332,7 +389,20 @@ alert(
 "Referral link copied! 🔗"
 );
 
+}catch(error){
+
+alert(link);
+
 }
+
+}
+
+
+/* ================================
+   START TRACKING
+================================ */
+
+recordPageView();
 
 </script>
 
