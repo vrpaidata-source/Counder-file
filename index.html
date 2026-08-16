@@ -1,149 +1,4 @@
-<!DOCTYPE html>
-<html lang="ta">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VR Paidata | Tamil Comedy</title>
-
-<style>
-*{box-sizing:border-box}
-
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:linear-gradient(135deg,#111827,#4c1d95);
-    color:white;
-}
-
-.container{
-    max-width:600px;
-    margin:auto;
-    padding:25px 15px;
-}
-
-.card{
-    background:rgba(255,255,255,.10);
-    border-radius:25px;
-    padding:25px;
-    text-align:center;
-    box-shadow:0 10px 40px rgba(0,0,0,.3);
-}
-
-h1{font-size:32px;margin-bottom:5px}
-
-.subtitle{
-    color:#ddd;
-    margin-bottom:25px;
-}
-
-button,.follow{
-    width:100%;
-    display:block;
-    border:0;
-    padding:16px;
-    margin:12px 0;
-    border-radius:15px;
-    font-size:17px;
-    font-weight:bold;
-    color:white;
-    text-decoration:none;
-    cursor:pointer;
-}
-
-.instagram{background:#e1306c}
-.facebook{background:#1877f2}
-.share{background:#16a34a}
-.copy{background:#7c3aed}
-
-.stats{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-top:20px;
-}
-
-.stat{
-    background:rgba(0,0,0,.25);
-    padding:18px;
-    border-radius:15px;
-}
-
-.number{
-    font-size:28px;
-    font-weight:bold;
-}
-
-.label{
-    font-size:12px;
-    color:#ccc;
-}
-
-.footer{
-    font-size:12px;
-    color:#bbb;
-    margin-top:25px;
-    line-height:1.6;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-<div class="card">
-
-<h1>😂 VR Paidata</h1>
-
-<p class="subtitle">
-Tamil Comedy • AI Animation • Fun Videos
-</p>
-
-<a class="follow instagram"
-href="https://www.instagram.com/vrpaidata/"
-target="_blank">
-📸 Instagram-ல் Follow செய்யுங்கள்
-</a>
-
-<a class="follow facebook"
-href="https://www.facebook.com/share/19PZBhTyHL/"
-target="_blank">
-👍 Facebook-ல் Follow செய்யுங்கள்
-</a>
-
-<button class="share" onclick="sharePage()">
-📤 நண்பர்களுடன் Share செய்யுங்கள்
-</button>
-
-<button class="copy" onclick="copyReferral()">
-🔗 Referral Link Copy
-</button>
-
-<div class="stats">
-
-<div class="stat">
-<div class="number" id="views">0</div>
-<div class="label">Page Views</div>
-</div>
-
-<div class="stat">
-<div class="number" id="shares">0</div>
-<div class="label">Share Clicks</div>
-</div>
-
-</div>
-
-<div class="footer">
-😂 உங்கள் நண்பர்களுக்கும் இந்த page-ஐ share செய்யுங்கள்!
-<br><br>
-Page Views Supabase database மூலம் கணக்கிடப்படுகிறது.
-</div>
-
-</div>
-</div>
-
 <script>
-
-/* SUPABASE */
 
 const SUPABASE_URL =
 "https://saesruoufprdchtnbedk.supabase.co";
@@ -151,187 +6,210 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
 "sb_publishable_YdTvNMS3TgS5Pe9yyQS7pg_UlsTsqf9";
 
+/* =========================
+   SUPABASE REQUEST
+========================= */
 
-/* PAGE VIEW */
+async function supabaseRequest(table, options = {}) {
 
-async function recordPageView(){
+    const response = await fetch(
+        SUPABASE_URL + "/rest/v1/" + table,
+        {
+            ...options,
+            headers: {
+                "apikey": SUPABASE_KEY,
+                "Authorization": "Bearer " + SUPABASE_KEY,
+                "Content-Type": "application/json",
+                "Prefer": "return=representation",
+                ...(options.headers || {})
+            }
+        }
+    );
 
-try{
+    if (!response.ok) {
+        throw new Error(await response.text());
+    }
 
-const response = await fetch(
-SUPABASE_URL + "/rest/v1/visits",
-{
-method:"POST",
-headers:{
-"apikey":SUPABASE_KEY,
-"Authorization":"Bearer " + SUPABASE_KEY,
-"Content-Type":"application/json",
-"Prefer":"return=minimal"
-},
-body:JSON.stringify({})
-}
-);
-
-if(response.ok){
-loadViewCount();
-}else{
-console.log("View insert failed:",response.status);
-}
-
-}catch(error){
-console.log("View tracking error:",error);
-}
-
+    return response;
 }
 
 
-/* GET TOTAL VIEWS */
+/* =========================
+   PAGE VIEWS
+========================= */
 
-async function loadViewCount(){
+async function recordPageView() {
 
-try{
+    try {
 
-const response = await fetch(
-SUPABASE_URL + "/rest/v1/visits?select=id",
-{
-method:"GET",
-headers:{
-"apikey":SUPABASE_KEY,
-"Authorization":"Bearer " + SUPABASE_KEY,
-"Prefer":"count=exact",
-"Range":"0-0"
-}
-}
-);
+        await supabaseRequest("Visitors", {
+            method: "POST",
+            body: JSON.stringify({})
+        });
 
-const range =
-response.headers.get("content-range");
+        await updateViewCount();
 
-if(range){
+    } catch (error) {
 
-const total =
-range.split("/")[1];
+        console.log("Page view error:", error);
 
-document.getElementById("views").innerText =
-total || "0";
-
-}
-
-}catch(error){
-console.log("Count error:",error);
-}
-
+    }
 }
 
 
-/* SHARE COUNT */
+async function updateViewCount() {
 
-let shares =
-Number(localStorage.getItem("vr_shares") || 0);
+    try {
 
-document.getElementById("shares").innerText =
-shares;
+        const response = await fetch(
+            SUPABASE_URL +
+            "/rest/v1/Visitors?select=id",
+            {
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization":
+                    "Bearer " + SUPABASE_KEY
+                }
+            }
+        );
 
+        const data = await response.json();
 
-/* REFERRAL LINK */
+        document.getElementById("views").innerText =
+            data.length;
 
-function getReferralLink(){
+    } catch (error) {
 
-let id =
-localStorage.getItem("vr_ref_id");
+        console.log("View count error:", error);
 
-if(!id){
-
-id =
-"VR" +
-Math.random()
-.toString(36)
-.substring(2,8)
-.toUpperCase();
-
-localStorage.setItem("vr_ref_id",id);
-
-}
-
-return location.origin +
-location.pathname +
-"?ref=" + id;
-
+    }
 }
 
 
-/* SHARE */
+/* =========================
+   SHARE COUNT
+========================= */
 
-async function sharePage(){
+async function updateShareCount() {
 
-const link =
-getReferralLink();
+    try {
 
-shares++;
+        const response = await fetch(
+            SUPABASE_URL +
+            "/rest/v1/Shares?select=id",
+            {
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization":
+                    "Bearer " + SUPABASE_KEY
+                }
+            }
+        );
 
-localStorage.setItem("vr_shares",shares);
+        const data = await response.json();
 
-document.getElementById("shares").innerText =
-shares;
+        document.getElementById("shares").innerText =
+            data.length;
 
-if(navigator.share){
+    } catch (error) {
 
-try{
+        console.log("Share count error:", error);
 
-await navigator.share({
-title:"VR Paidata",
-text:"😂 இந்த Tamil Comedy page-ஐ பாருங்க!",
-url:link
-});
-
-}catch(error){}
-
-}else{
-
-try{
-
-await navigator.clipboard.writeText(link);
-
-alert("Referral link copied! நண்பர்களுக்கு அனுப்புங்கள் 😂");
-
-}catch(error){
-
-alert(link);
-
-}
-
-}
-
+    }
 }
 
 
-/* COPY */
+/* =========================
+   SHARE BUTTON
+========================= */
 
-async function copyReferral(){
+async function sharePage() {
 
-const link =
-getReferralLink();
+    const link = window.location.href;
 
-try{
+    try {
 
-await navigator.clipboard.writeText(link);
+        /* Save share click */
 
-alert("Referral link copied! 🔗");
+        await supabaseRequest("Shares", {
+            method: "POST",
+            body: JSON.stringify({})
+        });
 
-}catch(error){
+        /* Update number immediately */
 
-alert(link);
+        await updateShareCount();
+
+
+        /* Open sharing */
+
+        if (navigator.share) {
+
+            try {
+
+                await navigator.share({
+                    title: "VR Paidata",
+                    text: "😂 இந்த Tamil Comedy page-ஐ பாருங்க!",
+                    url: link
+                });
+
+            } catch (error) {
+
+                console.log("Share cancelled");
+
+            }
+
+        } else {
+
+            await navigator.clipboard.writeText(link);
+
+            alert(
+                "🔗 Link copied!\nநண்பர்களுக்கு share செய்யுங்கள் 😂"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.log("Share error:", error);
+
+        alert(
+            "Share count save ஆகவில்லை. Supabase policy-ஐ check செய்யுங்கள்."
+        );
+
+    }
+}
+
+
+/* =========================
+   COPY REFERRAL
+========================= */
+
+async function copyReferral() {
+
+    const link = window.location.href;
+
+    try {
+
+        await navigator.clipboard.writeText(link);
+
+        alert("🔗 Link copied! 😂");
+
+    } catch (error) {
+
+        alert("Link copy செய்ய முடியவில்லை.");
+
+    }
 
 }
 
-}
 
-
-/* START */
+/* =========================
+   START
+========================= */
 
 recordPageView();
 
-</script>
+updateShareCount();
 
-</body>
-</html>
+</script>
