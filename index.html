@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>VR PAIData | Viknesh.N</title>
+<title>😂 VR Paidata | Tamil Comedy</title>
 
 <style>
 *{
@@ -76,7 +76,7 @@ h1{
 
 .stats{
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:1fr;
     gap:12px;
     margin-top:20px;
 }
@@ -103,12 +103,6 @@ h1{
     margin-top:25px;
     line-height:1.6;
 }
-
-.status{
-    font-size:12px;
-    color:#aaa;
-    margin-top:10px;
-}
 </style>
 </head>
 
@@ -118,125 +112,71 @@ h1{
 
 <div class="card">
 
-<h1> VR PAIData </h1>
+<h1>😂 VR Paidata</h1>
 
 <p class="subtitle">
-லைக் 👍 • கமெண்ட்ஸ் 📩 • சேர் 📡
+Tamil Comedy • AI Animation • Fun Videos
 </p>
-
-
-<!-- INSTAGRAM -->
 
 <a
 class="follow instagram"
 href="https://www.instagram.com/vrpaidata/"
 target="_blank"
 rel="noopener">
-
 📸 Instagram-ல் Follow செய்யுங்கள்
-
 </a>
-
-
-<!-- FACEBOOK -->
 
 <a
 class="follow facebook"
 href="https://www.facebook.com/share/19PZBhTyHL/"
 target="_blank"
 rel="noopener">
-
 👍 Facebook-ல் Follow செய்யுங்கள்
-
 </a>
-
-
-<!-- REFERRAL COPY -->
 
 <button
 class="copy"
 onclick="copyReferral()">
-
 🔗 Referral Link Copy
-
 </button>
-
-
-<!-- SHARE -->
 
 <button
 class="share"
 onclick="sharePage()">
-
-📤 இந்த லிங்க்-ஐ Share செய்யுங்கள்
-
+📤 இந்த Page-ஐ Share செய்யுங்கள்
 </button>
-
-
-<!-- STATS -->
 
 <div class="stats">
 
-    <div class="stat">
-
-        <div
-        class="number"
-        id="views">
-
-        0
-
-        </div>
-
-        <div class="label">
-
-        Page Views
-
-        </div>
-
-    </div>
-
-
-    <div class="stat">
-
-        <div
-        class="number"
-        id="shares">
-
-        0
-
-        </div>
-
-        <div class="label">
-
-        Shares
-
-        </div>
-
-    </div>
-
-</div>
-
+<div class="stat">
 
 <div
-class="status"
-id="status">
+class="number"
+id="views">
+0
 </div>
 
+<div class="label">
+Page Views
+</div>
+
+</div>
+
+</div>
 
 <div class="footer">
 
- உங்கள் நண்பர்களுக்கும் இந்த லிங்க்-ஐ அனுப்புங்கள்!
+😂 உங்கள் நண்பர்களுக்கும் இந்த page-ஐ அனுப்புங்கள்!
 
 <br><br>
 
-Sponsord by VR PAIData Supabase database மூலம் கணக்கிடப்படுகிறது.
+Page Views Supabase database மூலம் கணக்கிடப்படுகிறது.
 
 </div>
 
 </div>
 
 </div>
-
 
 <script>
 
@@ -255,26 +195,18 @@ const SUPABASE_KEY =
    SUPABASE REQUEST
 ========================= */
 
-async function supabaseRequest(
-    table,
-    options = {}
-){
+async function supabaseRequest(table, options = {}){
 
-    const response =
-    await fetch(
-        SUPABASE_URL +
-        "/rest/v1/" +
-        table,
+    const response = await fetch(
+        SUPABASE_URL + "/rest/v1/" + table,
         {
             ...options,
 
             headers:{
-                "apikey":
-                SUPABASE_KEY,
+                "apikey": SUPABASE_KEY,
 
                 "Authorization":
-                "Bearer " +
-                SUPABASE_KEY,
+                "Bearer " + SUPABASE_KEY,
 
                 "Content-Type":
                 "application/json",
@@ -305,20 +237,23 @@ async function addPageView(){
             {
                 method:"POST",
 
-                body:JSON.stringify({})
+                body:JSON.stringify({
+                    Vister: 1
+                })
             }
         );
-
 
         if(!response.ok){
 
             console.log(
-                "Visitor insert failed:",
-                response.status,
+                "Page view error:",
                 await response.text()
             );
 
+            return;
         }
+
+        getPageViews();
 
     }catch(error){
 
@@ -328,8 +263,6 @@ async function addPageView(){
         );
 
     }
-
-    getPageViews();
 
 }
 
@@ -376,13 +309,11 @@ async function getPageViews(){
         if(!response.ok){
 
             console.log(
-                "View count failed:",
-                response.status,
+                "Count error:",
                 await response.text()
             );
 
             return;
-
         }
 
 
@@ -398,11 +329,10 @@ async function getPageViews(){
             contentRange
             .split("/")[1];
 
-
             document.getElementById(
                 "views"
             ).innerText =
-            total || "0";
+            total;
 
         }
 
@@ -410,136 +340,6 @@ async function getPageViews(){
 
         console.log(
             "View count error:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================
-   ADD SHARE
-========================= */
-
-async function recordShare(){
-
-    try{
-
-        const response =
-        await supabaseRequest(
-            "Share",
-            {
-                method:"POST",
-
-                body:JSON.stringify({})
-            }
-        );
-
-
-        if(!response.ok){
-
-            console.log(
-                "Share insert failed:",
-                response.status,
-                await response.text()
-            );
-
-            return;
-
-        }
-
-
-        getShareCount();
-
-    }catch(error){
-
-        console.log(
-            "Share error:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================
-   GET SHARE COUNT
-========================= */
-
-async function getShareCount(){
-
-    try{
-
-        const response =
-        await fetch(
-
-            SUPABASE_URL +
-            "/rest/v1/Share?select=id",
-
-            {
-                method:"GET",
-
-                headers:{
-
-                    "apikey":
-                    SUPABASE_KEY,
-
-                    "Authorization":
-                    "Bearer " +
-                    SUPABASE_KEY,
-
-                    "Prefer":
-                    "count=exact",
-
-                    "Range":
-                    "0-0"
-
-                }
-
-            }
-
-        );
-
-
-        if(!response.ok){
-
-            console.log(
-                "Share count failed:",
-                response.status,
-                await response.text()
-            );
-
-            return;
-
-        }
-
-
-        const contentRange =
-        response.headers.get(
-            "content-range"
-        );
-
-
-        if(contentRange){
-
-            const total =
-            contentRange
-            .split("/")[1];
-
-
-            document.getElementById(
-                "shares"
-            ).innerText =
-            total || "0";
-
-        }
-
-    }catch(error){
-
-        console.log(
-            "Share count error:",
             error
         );
 
@@ -603,11 +403,9 @@ async function copyReferral(){
         await navigator.clipboard
         .writeText(link);
 
-
         alert(
             "Referral link copied! 🔗"
         );
-
 
     }catch(error){
 
@@ -631,10 +429,6 @@ async function sharePage(){
     getReferralLink();
 
 
-    /* =====================
-       NATIVE SHARE
-    ===================== */
-
     if(navigator.share){
 
         try{
@@ -652,13 +446,6 @@ async function sharePage(){
 
             });
 
-
-            /* Record only after
-               successful share */
-
-            await recordShare();
-
-
         }catch(error){
 
             console.log(
@@ -668,35 +455,25 @@ async function sharePage(){
 
         }
 
-        return;
+    }else{
 
-    }
+        try{
 
+            await navigator.clipboard
+            .writeText(link);
 
-    /* =====================
-       FALLBACK
-    ===================== */
+            alert(
+                "Link copied! 📋"
+            );
 
-    try{
+        }catch(error){
 
-        await navigator.clipboard
-        .writeText(link);
+            prompt(
+                "இந்த link-ஐ Share செய்யுங்கள்:",
+                link
+            );
 
-
-        alert(
-            "Link copied! 📋"
-        );
-
-
-        await recordShare();
-
-
-    }catch(error){
-
-        prompt(
-            "இந்த link-ஐ Share செய்யுங்கள்:",
-            link
-        );
+        }
 
     }
 
@@ -704,15 +481,12 @@ async function sharePage(){
 
 
 /* =========================
-   INITIAL LOAD
+   START
 ========================= */
 
 getPageViews();
 
-getShareCount();
-
 addPageView();
-
 
 </script>
 
