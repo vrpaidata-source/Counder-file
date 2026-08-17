@@ -76,7 +76,7 @@ h1{
 
 .stats{
     display:grid;
-    grid-template-columns:1fr;
+    grid-template-columns:1fr 1fr;
     gap:12px;
     margin-top:20px;
 }
@@ -118,6 +118,8 @@ h1{
 Tamil Comedy • AI Animation • Fun Videos
 </p>
 
+<!-- INSTAGRAM -->
+
 <a
 class="follow instagram"
 href="https://www.instagram.com/vrpaidata/"
@@ -125,6 +127,9 @@ target="_blank"
 rel="noopener">
 📸 Instagram-ல் Follow செய்யுங்கள்
 </a>
+
+
+<!-- FACEBOOK -->
 
 <a
 class="follow facebook"
@@ -134,17 +139,26 @@ rel="noopener">
 👍 Facebook-ல் Follow செய்யுங்கள்
 </a>
 
+
+<!-- COPY -->
+
 <button
 class="copy"
 onclick="copyReferral()">
 🔗 Referral Link Copy
 </button>
 
+
+<!-- SHARE -->
+
 <button
 class="share"
 onclick="sharePage()">
 📤 இந்த Page-ஐ Share செய்யுங்கள்
 </button>
+
+
+<!-- STATS -->
 
 <div class="stats">
 
@@ -162,7 +176,23 @@ Page Views
 
 </div>
 
+
+<div class="stat">
+
+<div
+class="number"
+id="shares">
+0
 </div>
+
+<div class="label">
+Share Clicks
+</div>
+
+</div>
+
+</div>
+
 
 <div class="footer">
 
@@ -170,13 +200,14 @@ Page Views
 
 <br><br>
 
-Page Views Supabase database மூலம் கணக்கிடப்படுகிறது.
+Page Views & Share Clicks Supabase database மூலம் கணக்கிடப்படுகிறது.
 
 </div>
 
 </div>
 
 </div>
+
 
 <script>
 
@@ -192,18 +223,18 @@ const SUPABASE_KEY =
 
 
 /* =========================
-   SUPABASE REQUEST
+   COMMON REQUEST
 ========================= */
 
 async function supabaseRequest(table, options = {}){
 
-    const response = await fetch(
+    return fetch(
         SUPABASE_URL + "/rest/v1/" + table,
         {
             ...options,
 
             headers:{
-                "apikey": SUPABASE_KEY,
+                "apikey":SUPABASE_KEY,
 
                 "Authorization":
                 "Bearer " + SUPABASE_KEY,
@@ -211,20 +242,15 @@ async function supabaseRequest(table, options = {}){
                 "Content-Type":
                 "application/json",
 
-                "Prefer":
-                "return=minimal",
-
                 ...(options.headers || {})
             }
         }
     );
-
-    return response;
 }
 
 
 /* =========================
-   ADD PAGE VIEW
+   ADD VISITOR
 ========================= */
 
 async function addPageView(){
@@ -238,27 +264,25 @@ async function addPageView(){
                 method:"POST",
 
                 body:JSON.stringify({
-                    Vister: 1
+                    Vister:1
                 })
             }
         );
 
+
         if(!response.ok){
 
             console.log(
-                "Page view error:",
+                "Visitor error:",
                 await response.text()
             );
 
-            return;
         }
-
-        getPageViews();
 
     }catch(error){
 
         console.log(
-            "Page view error:",
+            "Visitor error:",
             error
         );
 
@@ -268,7 +292,7 @@ async function addPageView(){
 
 
 /* =========================
-   GET PAGE VIEW COUNT
+   GET VISITOR COUNT
 ========================= */
 
 async function getPageViews(){
@@ -277,15 +301,12 @@ async function getPageViews(){
 
         const response =
         await fetch(
-
             SUPABASE_URL +
             "/rest/v1/Visitors?select=id",
-
             {
                 method:"GET",
 
                 headers:{
-
                     "apikey":
                     SUPABASE_KEY,
 
@@ -298,41 +319,26 @@ async function getPageViews(){
 
                     "Range":
                     "0-0"
-
                 }
-
             }
-
         );
 
 
-        if(!response.ok){
-
-            console.log(
-                "Count error:",
-                await response.text()
-            );
-
-            return;
-        }
-
-
-        const contentRange =
+        const range =
         response.headers.get(
             "content-range"
         );
 
 
-        if(contentRange){
+        if(range){
 
             const total =
-            contentRange
-            .split("/")[1];
+            range.split("/")[1];
 
             document.getElementById(
                 "views"
-            ).innerText =
-            total;
+            ).textContent =
+            total || "0";
 
         }
 
@@ -340,6 +346,115 @@ async function getPageViews(){
 
         console.log(
             "View count error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================
+   ADD SHARE
+========================= */
+
+async function addShare(){
+
+    try{
+
+        const response =
+        await supabaseRequest(
+            "Share",
+            {
+                method:"POST",
+
+                body:JSON.stringify({
+                    Share:1
+                })
+            }
+        );
+
+
+        if(!response.ok){
+
+            console.log(
+                "Share error:",
+                await response.text()
+            );
+
+            return;
+        }
+
+
+        getShareCount();
+
+    }catch(error){
+
+        console.log(
+            "Share error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================
+   GET SHARE COUNT
+========================= */
+
+async function getShareCount(){
+
+    try{
+
+        const response =
+        await fetch(
+            SUPABASE_URL +
+            "/rest/v1/Share?select=id",
+            {
+                method:"GET",
+
+                headers:{
+                    "apikey":
+                    SUPABASE_KEY,
+
+                    "Authorization":
+                    "Bearer " +
+                    SUPABASE_KEY,
+
+                    "Prefer":
+                    "count=exact",
+
+                    "Range":
+                    "0-0"
+                }
+            }
+        );
+
+
+        const range =
+        response.headers.get(
+            "content-range"
+        );
+
+
+        if(range){
+
+            const total =
+            range.split("/")[1];
+
+            document.getElementById(
+                "shares"
+            ).textContent =
+            total || "0";
+
+        }
+
+    }catch(error){
+
+        console.log(
+            "Share count error:",
             error
         );
 
@@ -368,7 +483,6 @@ function getReferralLink(){
         .toString(36)
         .substring(2,8)
         .toUpperCase();
-
 
         localStorage.setItem(
             "vr_ref_id",
@@ -407,6 +521,12 @@ async function copyReferral(){
             "Referral link copied! 🔗"
         );
 
+        /*
+         Optional:
+         Copy button is NOT counted
+         as a real share.
+        */
+
     }catch(error){
 
         prompt(
@@ -429,6 +549,8 @@ async function sharePage(){
     getReferralLink();
 
 
+    /* Native share */
+
     if(navigator.share){
 
         try{
@@ -446,34 +568,50 @@ async function sharePage(){
 
             });
 
+
+            /*
+             Share completed
+             → record one share
+            */
+
+            await addShare();
+
         }catch(error){
+
+            /*
+             User cancelled share
+             → don't count
+            */
 
             console.log(
-                "Share cancelled:",
-                error
+                "Share cancelled"
             );
 
         }
 
-    }else{
+        return;
+    }
 
-        try{
 
-            await navigator.clipboard
-            .writeText(link);
+    /* Browser without Web Share API */
 
-            alert(
-                "Link copied! 📋"
-            );
+    try{
 
-        }catch(error){
+        await navigator.clipboard
+        .writeText(link);
 
-            prompt(
-                "இந்த link-ஐ Share செய்யுங்கள்:",
-                link
-            );
+        alert(
+            "Link copied! 📋"
+        );
 
-        }
+        await addShare();
+
+    }catch(error){
+
+        prompt(
+            "இந்த link-ஐ Share செய்யுங்கள்:",
+            link
+        );
 
     }
 
@@ -485,6 +623,8 @@ async function sharePage(){
 ========================= */
 
 getPageViews();
+
+getShareCount();
 
 addPageView();
 
